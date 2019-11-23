@@ -1,12 +1,10 @@
 
+import ee382n.MSG_2D_CLASS;
+import ee382n.MSG_3D_CLASS;
+
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Scanner;
-import java.util.Arrays;
+import java.util.*;
 
 
 /****************Secontion but you have to*********************/
@@ -159,13 +157,34 @@ public class ByzantineServer{
     //output scalar R,the number of rounds needed to converge along
     //each dimension 1 ≤ m ≤ d.
     //output an updated current value v;
+    //MSG2D consists of element of (p,r,v)
+    //Val = ArrayList<MSG2D>
+    //wit = ArrayList(p,r, Val)
+    //MSG3D consists of element of (p,r,Val)
+    //content of wit = ArrayList<ArrayList<MSG2D>> = ArrayList<Val>
     public CalculateRounds(arraylist input_vector){
         RBSend(p, 0, input_vector);
+        //each item is a 2d mssage
+        ArrayList<MSG_2D_CLASS> V_received = new ArrayList<MSG_2D_CLASS>();
+        //each item is a 3d message
+        ArrayList<MSG_3D_CLASS> Wit_recieved = new ArrayList<MSG_3D_CLASS>();
+        //Content of recevied 3d msg
+        ArrayList<ArrayList<MSG_2D_CLASS>> W_received = new ArrayList<ArrayList<MSG_2D_CLASS>>();
         //( V, W ) ← (Val , Content(Wit)) from RBReceiveWitness(0)
-        (V,W) = RBReceiveWitness(0);
+        (V_received,Wit_recieved) = RBReceiveWitness(0);
+        //calculate content of Wit_received
+        W_received = Wit_recieved.getcontent();
         //U ← { barycenter of Safe f ( W ′ ) : W ′ ∈ W }
+        //define U as a set of barycenter
+        for (int i =0; i<W_received.length; i++){
+            U.add(barycenter(Safe(W_received(i))));
+        }
         //v ← barycenter of Safe f ( U )
+        v= barycenter(Safe(U));
         //R ← log 2 ( d / ε · max {δ U ( m ) : 1 ≤ m ≤ d} )
+        d_sqrt_over_epsolon = Math.sqrt(d)/epsilon;
+        max_range_U = max_range(U);
+        R = Math.ceil(Math.log(d_sqrt_over_epsolon*max_range_U)/Math.log(2));
         return (R,v);
     }
 }
