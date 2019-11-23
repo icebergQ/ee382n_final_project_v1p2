@@ -17,6 +17,8 @@ import java.util.Arrays;
  * initalize 5 servers
  * run RB and WT
  * */
+
+
 public class ByzantineServer{
 
     //or randomly generated vector based on simulating robot x y z position
@@ -39,6 +41,69 @@ public class ByzantineServer{
             System.out.println(Integer.toString(theClient.getLocalPort())+" requesting pid and lamport clock "+ Integer.toString(pid)+ " "+ Integer.toString(vectorValue));
             TCPSendClientRequest(hostAddress, server, "request "+ Integer.toString(pid)+ " "+ Integer.toString(vectorValue));
         }
+    }
+
+    //receive witness technique
+    public RBReceiveWitness(int r){
+        int [] val = "";    //value
+        int [] rep = "";    //report
+        int [] wit = "";    //witness
+
+        while(val.length< 5-1){
+            //implement on receive
+            onReceive(int pid, int r, int[] pvalue){
+                val= val union int pid, int r, int[] pvalue
+            }
+
+        }
+        RBSend(p, r, Val);
+
+        while(wit.length < n-f){
+            //adding the extra incoming message into val, repeat of above to catch f messages
+            onReceive(int pid, int r, int[] pvalue){
+                val= val union int pid, int r, int[] pvalue
+            }
+            onReceive(int pid, int r, int[] val){
+                rep= rep union int pid, int r, int[] val
+            }
+        }
+        return val;
+    }
+
+
+    /*Mendes Herlihy algorithm
+    *input: I: input in R of d dimension
+    */
+    public AsyncAgreeMH(int [] I){
+        //set the number of rounds needed R and vector updated current value v
+        CalculateRounds(I);
+        int [] midpoint;
+        //d = number of input vector dimension
+        for (int m =1 , m<= d; m++){
+            H = null;
+            int currentRound = 1;
+            while (H.length <= f){
+                RBSend(pid, currentRound, v);
+                //need to wait for witness to return
+                int [] Val = RBReceiveWitness(currentRound);
+                //implement safe area algo
+                int [] S = Safef(val);
+                //implement midpoint algo
+                midpoint[m] = Midpoint(S[m]);
+                if(currentRound==R) RBSend(pid, currentRound, "Halt");
+                else currentRound++;
+
+                //stop and add halt to H,
+                onReceive("Halt"){
+                    if
+                        //add halt message to H
+                        H+="Halt";
+                }
+
+            }
+
+        }
+        return midpoint;
     }
 
     //echo
@@ -88,6 +153,20 @@ public class ByzantineServer{
     public RBRecv(int pid, int round, arraylist value){
         recv(·; qr{ready}; c) from n − f processes
         return (q,r,c);
+    }
+
+    //input vector in R^d
+    //output scalar R,the number of rounds needed to converge along
+    //each dimension 1 ≤ m ≤ d.
+    //output an updated current value v;
+    public CalculateRounds(arraylist input_vector){
+        RBSend(p, 0, input_vector);
+        //( V, W ) ← (Val , Content(Wit)) from RBReceiveWitness(0)
+        (V,W) = RBReceiveWitness(0);
+        //U ← { barycenter of Safe f ( W ′ ) : W ′ ∈ W }
+        //v ← barycenter of Safe f ( U )
+        //R ← log 2 ( d / ε · max {δ U ( m ) : 1 ≤ m ≤ d} )
+        return (R,v);
     }
 }
 
