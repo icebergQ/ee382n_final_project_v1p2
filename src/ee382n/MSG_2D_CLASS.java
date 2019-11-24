@@ -16,6 +16,25 @@ public class MSG_2D_CLASS {
     public int getPid() {
         return pid;
     }
+    public String toMessageString() {
+        String messageString = "";
+        for(double d: msg2d) messageString=messageString+Double.toString(d)+" ";
+        return Integer.toString(pid)+" "+Integer.toString(round)+" "+ messageString;
+    }
+
+    public void fromMessageValue(String messageString){
+        //"1 1 2.2 3.3 "
+        String [] messageStringArray = messageString.split(" ");
+
+        this.pid = Integer.parseInt(messageStringArray[0]);
+        this.round = Integer.parseInt(messageStringArray[1]);
+
+        ArrayList<Double> tempList = null;
+        for(int i = 2; i<messageStringArray.length; i++) tempList.add(Double.parseDouble(messageStringArray[i]));
+
+        this.msg2d = tempList;
+
+    }
 
     public int getRound() {
         return round;

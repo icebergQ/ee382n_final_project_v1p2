@@ -15,6 +15,7 @@ public class finalproject {
 
         MSG_2D_CLASS msg_2D_class1 = new MSG_2D_CLASS(22,1,msg1);
         System.out.println(msg_2D_class1.getPid());
+        System.out.println("HELLO");
 
     }
 }

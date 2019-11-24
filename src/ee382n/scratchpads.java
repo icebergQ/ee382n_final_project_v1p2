@@ -20,7 +20,7 @@ import java.util.*;
 public class ByzantineServer{
 
     //or randomly generated vector based on simulating robot x y z position
-    int [] vectorValue = [1,2,3];
+    ArrayList<Double> vectorValue = new ArrayList<Double>([1,2]);
     public id = 1;
     public round = 0;
     int [] serverList = null;
@@ -34,36 +34,60 @@ public class ByzantineServer{
         this.serverList= list;
     }
 
-    public RBSend(int pid, int round, arrayList vectorValue){
+    /*
+    Algo 1 RBSend
+    TODO add handler for different content value
+    sender information:
+    *   sender id p
+    *   sender round r
+    *   sender content c
+    */
+    public void RBSend(int pid, int round, ArrayList<Double> vectorValue){
         for (int server : serverList) {
             System.out.println(Integer.toString(theClient.getLocalPort())+" requesting pid and lamport clock "+ Integer.toString(pid)+ " "+ Integer.toString(vectorValue));
             TCPSendClientRequest(hostAddress, server, "request "+ Integer.toString(pid)+ " "+ Integer.toString(vectorValue));
         }
     }
 
-    //receive witness technique
+    //receive witness technique: algo 4
     public RBReceiveWitness(int r){
-        int [] val = "";    //value
-        int [] rep = "";    //report
+        Arraylist<MSG_2D_CLASS> val = new ArrayList<MSG_2D_CLASS>();    //value
+        ArrayList<Arraylist<MSG_2D_CLASS>> rep = new ArrayList<ArrayList<MSG_2D_CLASS>>();    //report
         int [] wit = "";    //witness
+
+        //change how we receieve this info**********************************
+        Scanner s = new Scanner(theClient.getInputStream());
+        PrintWriter pout = new PrintWriter(theClient.getOutputStream());
+        String xContent = s.nextLine();
+        System.out.println(Integer.toString(theClient.getLocalPort())+" recieved command: "+xContent);
+        //******************************************************************
 
         while(val.length< 5-1){
             //implement on receive
             onReceive(int pid, int r, int[] pvalue){
-                val= val union int pid, int r, int[] pvalue
+                MSG_2D_CLASS xLocalContent = new MSG_2D_CLASS(xContent[pid], xContent[r], double xContent[pvalue]);
+                val.add(xLocalContent);
             }
 
         }
-        RBSend(p, r, Val);
+        //this is sending Val, array of 2d classes
+        //!TODO add distinction in RBSend to handle this
+        RBSend(pid, r, Val);
 
         while(wit.length < n-f){
             //adding the extra incoming message into val, repeat of above to catch f messages
-            onReceive(int pid, int r, int[] pvalue){
-                val= val union int pid, int r, int[] pvalue
+            onReceive(int pid, int r, double[] pvalue){
+                MSG_2D_CLASS xLocalContent = new MSG_2D_CLASS(xContent[pid], xContent[r], double xContent[pvalue]);
+                val.add(xLocalContent);
             }
-            onReceive(int pid, int r, int[] val){
-                rep= rep union int pid, int r, int[] val
+
+            //receive Val information
+            onReceive(int pid, int r, Arraylist<MSG_2D_CLASS> val){
+                rep.add(pid, r, val);
             }
+            //Wit ← {(px, r, Valx) ∈ Rep : Valx ⊆ Val}
+            //witness will find n-f copies of the same valx thats in its val, when theres n-f, process is complete
+
         }
         return val;
     }
@@ -104,7 +128,16 @@ public class ByzantineServer{
         return midpoint;
     }
 
-    //echo
+    //RBEcho algo 2
+    /*
+           when other processes receive M, they echo it
+           when processes receive n-f echo messages for M, they send ready message for M
+           when processes see f+1 ready for M, it means a non-faulty processs advocates the existence of M
+           when theres n-f messages, the original message can be delivered
+     */
+    //Alg2 upon receiving blocking or not?
+    //we open n servers, each open n-1 thread to handle tcp connection to n-1 other servers
+    //Each thread has while true loop to handle different incoming messages.
     public void run(){
         try{
             Scanner s = new Scanner(theClient.getInputStream());
@@ -148,6 +181,10 @@ public class ByzantineServer{
 
     }
 
+    // RBRecv algo 3
+    //called by algo 6, TODO add functino to handle different 3rd parameter
+    //TODO how to implement wait until n-f processes
+    //may be able to add a call function in algo 2
     public RBRecv(int pid, int round, arraylist value){
         recv(·; qr{ready}; c) from n − f processes
         return (q,r,c);
@@ -186,6 +223,13 @@ public class ByzantineServer{
         max_range_U = max_range(U);
         R = Math.ceil(Math.log(d_sqrt_over_epsolon*max_range_U)/Math.log(2));
         return (R,v);
+    }
+
+    public AsyncAgreeVG(arraylist input_vector){
+        d_sqrt_over_epsolon = Math.sqrt(d)/epsilon;
+        R = 1 + Math.ceil(Math.log(d_sqrt_over_epsolon*(U-v))/Math.log(1/(1-lamda)));
+
+
     }
 }
 
